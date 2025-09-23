@@ -5,8 +5,6 @@ import { CgEye } from "react-icons/cg";
 import CtaBanner from "../../components/home/CtaBanner.astro";
 import { FiFacebook, FiInstagram, FiLinkedin, FiX } from "react-icons/fi";
 import { siteConfig } from "../../assets/site";
-import { connectDB, getDB } from "../../lib/mongodb";
-import View from "../../components/blog/View.jsx";
 
 // generate all slugs for static build
 export async function getStaticPaths() {
@@ -29,21 +27,7 @@ if (!post) throw new Error("Blog not found");
 
 // Render isi
 const { Content, headings } = await post.render();
-
-// Get Views
-const blogViews = { countViews: 0 };
-try {
-  await connectDB();
-  const db = getDB();
-  const blogDoc = await db
-    .collection("blogs")
-    .findOne({ slug: post.slug.replace(/^blog\//, "") });
-  if (blogDoc) {
-    blogViews.countViews = blogDoc.viewCount ?? blogDoc.views ?? 0;
-  }
-} catch (error) {
-  console.error("Failed to fetch blog views:", error);
-}
+const canonicalSlug = String(post.data?.slug ?? post.slug);
 ---
 
 <Layout
@@ -54,7 +38,6 @@ try {
     image: post.data.thumbnail,
   }}
 >
-  <View slug={post.slug} client:load />
   <header
     class="container mx-auto flex flex-col md:flex-row pt-28 md:pt-44 px-3 md:px-0 gap-6"
   >
@@ -127,7 +110,7 @@ try {
     <div class="container mx-auto py-1 px-3 md:px-0 flex gap-2 items-center">
       <CgEye />
       <p>
-        <span id="view-count">{blogViews.countViews}</span> views
+        <span id="view-count" data-slug={canonicalSlug}></span> views
       </p>
     </div>
   </div>
@@ -234,6 +217,25 @@ try {
       }
 
       window.open(shareUrl, "_blank", "noopener,noreferrer");
+    }
+
+    const viewCountEl = document.getElementById("view-count");
+    const postSlug = viewCountEl?.dataset.slug;
+    console.log("Post Slug:", postSlug);
+
+    if (viewCountEl && postSlug) {
+      fetch(`/api/increment`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug: postSlug }),
+      })
+        .then((r) => (r.ok ? r.json() : Promise.reject()))
+        .then((data) => {
+          viewCountEl.textContent = data.views;
+        })
+        .catch((e) => {
+          console.error("Failed to fetch view count", e);
+        });
     }
   });
 </script>

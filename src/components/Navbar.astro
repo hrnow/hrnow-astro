@@ -35,14 +35,13 @@ const currentPath = Astro.url.pathname;
         <ul class="menu menu-horizontal px-1">
           {
             linkItems.map((item) => {
-              console.log(currentPath, item.href);
               return (
                 <li>
                   <a
                     href={item.href}
                     class={
                       "text-sm font-medium " +
-                      (currentPath === item.href
+                      (currentPath == item.href
                         ? "text-primary"
                         : "text-base-content")
                     }
