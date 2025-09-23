@@ -5,11 +5,14 @@ import react from "@astrojs/react";
 import mdx from "@astrojs/mdx";
 import rehypeShiki from "@shikijs/rehype";
 
+import netlify from "@astrojs/netlify";
+
 // https://astro.build/config
 export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
   },
+
   integrations: [
     react(),
     mdx({
@@ -17,4 +20,6 @@ export default defineConfig({
       rehypePlugins: [[rehypeShiki, { theme: "one-dark-pro" }]],
     }),
   ],
+
+  adapter: netlify(),
 });
