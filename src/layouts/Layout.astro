@@ -33,25 +33,29 @@ const hasConsent = cookieHeader.includes("cookieConsent=accepted");
     <link rel="preconnect" href="https://www.googletagmanager.com" />
     <link rel="preconnect" href="https://www.google-analytics.com" />
 
-    <SEO {...(seo ?? {})} />
+    <SEO {...seo ?? {}} />
     <style>
-      html,body{
-        margin:0; padding:0;
+      html,
+      body {
+        margin: 0;
+        padding: 0;
       }
     </style>
   </head>
   <body>
-    {hasConsent && (
-      /* Render GTM noscript hanya jika consent sudah accepted di sisi server */
-      <noscript>
-        <iframe
-          src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
-          height="0"
-          width="0"
-          style="display:none;visibility:hidden">
-        </iframe>
-      </noscript>
-    )}
+    {
+      hasConsent && (
+        /* Render GTM noscript hanya jika consent sudah accepted di sisi server */
+        <noscript>
+          <iframe
+            src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
+            height="0"
+            width="0"
+            style="display:none;visibility:hidden"
+          />
+        </noscript>
+      )
+    }
 
     <Navbar />
     <slot />
@@ -62,52 +66,55 @@ const hasConsent = cookieHeader.includes("cookieConsent=accepted");
     <script is:inline define:vars={{ GTM_ID }}>
       // Inisialisasi dataLayer dan consent default (DENIED) — harus sebelum GTM dimuat
       window.dataLayer = window.dataLayer || [];
-      function gtag(){ dataLayer.push(arguments); }
+      function gtag() {
+        dataLayer.push(arguments);
+      }
 
-      gtag('consent', 'default', {
-        ad_storage: 'denied',
-        analytics_storage: 'denied',
-        ad_user_data: 'denied',
-        ad_personalization: 'denied',
-        wait_for_update: 500
+      gtag("consent", "default", {
+        ad_storage: "denied",
+        analytics_storage: "denied",
+        ad_user_data: "denied",
+        ad_personalization: "denied",
+        wait_for_update: 500,
       });
 
       // Hindari double-load
       window.gtmLoaded = false;
       function loadGTM() {
         if (window.gtmLoaded) return;
-        var s = document.createElement('script');
+        var s = document.createElement("script");
         s.async = true;
-        s.src = 'https://www.googletagmanager.com/gtm.js?id=' + GTM_ID;
+        s.src = "https://www.googletagmanager.com/gtm.js?id=" + GTM_ID;
         document.head.appendChild(s);
         window.gtmLoaded = true;
       }
 
       // Saat user ACCEPT dari banner cookies
-      window.addEventListener('cookies:accepted', () => {
-        gtag('consent', 'update', {
-          ad_storage: 'granted',
-          analytics_storage: 'granted',
-          ad_user_data: 'granted',
-          ad_personalization: 'granted'
+      window.addEventListener("cookies:accepted", () => {
+        gtag("consent", "update", {
+          ad_storage: "granted",
+          analytics_storage: "granted",
+          ad_user_data: "granted",
+          ad_personalization: "granted",
         });
-        gtag('event', 'cookie_consent', { status: 'accepted' });
+        gtag("event", "cookie_consent", { status: "accepted" });
         loadGTM();
       });
 
       // Jika sebelumnya sudah accept (cookie sudah ada), grant + load langsung
-      (function() {
+      (function () {
         function getCookie(name) {
           return document.cookie
-            .split('; ')
-            .find(r => r.startsWith(name + '='))?.split('=')[1];
+            .split("; ")
+            .find((r) => r.startsWith(name + "="))
+            ?.split("=")[1];
         }
-        if (getCookie('cookieConsent') === 'accepted') {
-          gtag('consent', 'update', {
-            ad_storage: 'granted',
-            analytics_storage: 'granted',
-            ad_user_data: 'granted',
-            ad_personalization: 'granted'
+        if (getCookie("cookieConsent") === "accepted") {
+          gtag("consent", "update", {
+            ad_storage: "granted",
+            analytics_storage: "granted",
+            ad_user_data: "granted",
+            ad_personalization: "granted",
           });
           loadGTM();
         }
