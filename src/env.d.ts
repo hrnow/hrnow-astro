@@ -9,6 +9,7 @@ interface ImportMetaEnv {
   MONGODB_URI?: string;
   PUBLIC_GTM_ID?: string;
   PUBLIC_API_BASE_URL?: string;
+  PUBLIC_APP_BASE_URL?: string;
 }
 
 interface ImportMeta {
