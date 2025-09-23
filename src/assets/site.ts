@@ -1,6 +1,6 @@
 export const siteConfig = {
   name: "hrnow",
-  url: "https://hrnow.ai",
+  url: "https://hrnow.asia/",
   username: "hrnow",
   year: "2025",
   description: "Masa depan rekrutmen dan pencari kerja tanpa perantara",
@@ -9,7 +9,7 @@ export const siteConfig = {
   social: {
     email: "mailto:hello@hrnow.com",
     whatsapp: "https://wa.me/1234567890",
-    instagram: "https://www.instagram.com/hrnow.ai",
+    instagram: "https://www.instagram.com/hrnow.asia",
     github: "https://github.com/hrnow",
     linkedin: "https://linkedin.com/in/hrnow",
   },
