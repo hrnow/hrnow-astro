@@ -1,0 +1,239 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import { CgEye } from "react-icons/cg";
+import CtaBanner from "../../components/home/CtaBanner.astro";
+import { FiFacebook, FiInstagram, FiLinkedin, FiX } from "react-icons/fi";
+import { siteConfig } from "../../assets/site";
+import { connectDB, getDB } from "../../lib/mongodb";
+import View from "../../components/blog/View.jsx";
+
+// generate all slugs for static build
+export async function getStaticPaths() {
+  const posts = await getCollection("blog");
+  return posts
+    .filter((p) => p.data.published)
+    .map((post) => {
+      const s = post.data?.slug ?? post.slug;
+      return { params: { slug: String(s) } };
+    });
+}
+
+// slug param
+const { slug } = Astro.params;
+if (!slug) throw new Error("Missing slug parameter");
+
+const posts = await getCollection("blog");
+const post = posts.find((p) => String(p.data?.slug ?? p.slug) === String(slug));
+if (!post) throw new Error("Blog not found");
+
+// Render isi
+const { Content, headings } = await post.render();
+
+// Get Views
+const blogViews = { countViews: 0 };
+try {
+  await connectDB();
+  const db = getDB();
+  const blogDoc = await db
+    .collection("blogs")
+    .findOne({ slug: post.slug.replace(/^blog\//, "") });
+  if (blogDoc) {
+    blogViews.countViews = blogDoc.viewCount ?? blogDoc.views ?? 0;
+  }
+} catch (error) {
+  console.error("Failed to fetch blog views:", error);
+}
+---
+
+<Layout
+  seo={{
+    title: post.data.title,
+    description: post.data.description,
+    url: `${siteConfig.url}/blog/${post.slug}`,
+    image: post.data.thumbnail,
+  }}
+>
+  <View slug={post.slug} client:load />
+  <header
+    class="container mx-auto flex flex-col md:flex-row pt-28 md:pt-44 px-3 md:px-0 gap-6"
+  >
+    <div class="space-y-5 p-3 flex-1 order-2 md:order-1">
+      <div class="flex items-center gap-2">
+        <a
+          href="/blog"
+          class="text-base text-primary font-medium hover:underline"
+        >
+          Blog
+        </a>
+        {
+          post.data.tags && post.data.tags.length > 0 && (
+            <>
+              <span class="mx-2">›</span>
+              <span class="text-base font-medium">{post.data.tags[0]}</span>
+            </>
+          )
+        }
+      </div>
+      <h2 class="text-2xl font-bold leading-tight mb-4">{post.data.title}</h2>
+      {
+        post.data.description && (
+          <p class="text-base-content/70 mb-6">{post.data.description}</p>
+        )
+      }
+      <div class="flex items-center gap-2 text-sm mt-4">
+        <img
+          alt="Foto profil sample"
+          src="/logo_hrnow.svg"
+          class="w-12 h-12 bg-white rounded-md shadow-md border-1 border-black p-1"
+          height={40}
+          width={40}
+        />
+
+        {post.data.author && <span>{post.data.author}</span>}
+        {
+          post.data.date && (
+            <>
+              <span class="mx-2">|</span>
+              <span>
+                Last updated on{" "}
+                {new Date(post.data.date).toLocaleDateString("en-US", {
+                  day: "2-digit",
+                  month: "long",
+                  year: "numeric",
+                })}
+              </span>
+            </>
+          )
+        }
+      </div>
+    </div>
+
+    {
+      post.data.thumbnail && (
+        <div class="flex-1 flex justify-center items-center md:justify-end order-1 md:order-2">
+          <img
+            src={post.data.thumbnail}
+            alt={post.data.title}
+            width={400}
+            height={300}
+            class=" object-cover bg-primary/10 w-auto h-80 rounded-xl"
+          />
+        </div>
+      )
+    }
+  </header>
+  <div class="border-y-1 border-black my-10">
+    <div class="container mx-auto py-1 px-3 md:px-0 flex gap-2 items-center">
+      <CgEye />
+      <p>
+        <span id="view-count">{blogViews.countViews}</span> views
+      </p>
+    </div>
+  </div>
+  <section
+    class="container mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 py-10 px-5 md:px-0"
+  >
+    <aside class="md:pr-4 order-2">
+      <div class="md:sticky md:top-36 space-y-6">
+        <div>
+          <p class="text-sm text-gray-600 mb-3">Share This Article</p>
+          <button
+            aria-label="Share on LinkedIn"
+            id="linkedin-share-button"
+            class="p-2 hover:text-primary-dark cursor-pointer"
+          >
+            <FiLinkedin size={20} />
+          </button>
+          <button
+            aria-label="Share on X"
+            id="x-share-button"
+            class="p-2 hover:text-primary-dark cursor-pointer"
+          >
+            <FiX size={20} />
+          </button>
+          <button
+            aria-label="Share on Facebook"
+            id="facebook-share-button"
+            class="p-2 hover:text-primary-dark cursor-pointer"
+          >
+            <FiFacebook size={20} />
+          </button>
+          <button
+            aria-label="Share on Instagram"
+            id="instagram-share-button"
+            class="p-2 hover:text-primary-dark cursor-pointer"
+          >
+            <FiInstagram size={20} />
+          </button>
+        </div>
+
+        {
+          headings.length > 0 && (
+            <div class="rounded-2xl bg-primary text-white py-3 px-6">
+              <h3 class="mb-3">In This Article</h3>
+              <nav class="space-y-1">
+                {headings.map((h) => (
+                  <a
+                    href={`#${h.slug}`}
+                    class={`block px-3 py-2 text-sm transition ${
+                      h.depth === 3 ? "ml-3 text-xs opacity-90" : ""
+                    }`}
+                  >
+                    {h.text}
+                  </a>
+                ))}
+              </nav>
+            </div>
+          )
+        }
+      </div>
+    </aside>
+
+    <article
+      class="prose prose-neutral dark:prose-invert max-w-none md:col-span-3 order-1"
+    >
+      <Content />
+    </article>
+  </section>
+
+  <CtaBanner client:load />
+</Layout>
+
+<script>
+  window.addEventListener("DOMContentLoaded", () => {
+    const byId = (id) => document.getElementById(id);
+
+    byId("linkedin-share-button")?.addEventListener("click", () =>
+      openShare("linkedin")
+    );
+    byId("x-share-button")?.addEventListener("click", () => openShare("x"));
+    byId("facebook-share-button")?.addEventListener("click", () =>
+      openShare("facebook")
+    );
+    byId("instagram-share-button")?.addEventListener("click", () =>
+      openShare("instagram")
+    );
+
+    function openShare(platform) {
+      const url = window.location.href;
+      const title = document.title;
+      const u = encodeURIComponent(url);
+      const t = encodeURIComponent(title);
+
+      let shareUrl = "";
+      if (platform === "linkedin")
+        shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${u}`;
+      else if (platform === "facebook")
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${u}`;
+      else if (platform === "x")
+        shareUrl = `https://twitter.com/intent/tweet?url=${u}&text=${t}`;
+      else if (platform === "instagram") {
+        alert("Instagram tidak mendukung berbagi langsung melalui URL.");
+        return;
+      }
+
+      window.open(shareUrl, "_blank", "noopener,noreferrer");
+    }
+  });
+</script>

@@ -1,0 +1,47 @@
+---
+import { siteConfig } from "../assets/site";
+import Layout from "../layouts/Layout.astro";
+import ContactProvider from "../components/contact/ContactProvider.jsx";
+
+const contactContent = {
+  title: "Hubungi kami hari ini!",
+  subtitle:
+    "Hubungi tim kami untuk mengotomatiskan dan meningkatkan skala sistem uji tuntas Anda.",
+  emailLabel: siteConfig.social.email.replace("mailto:", ""),
+};
+---
+
+<Layout
+  seo={{
+    title: "Kontak",
+    description:
+      "Ingin tahu lebih banyak tentang HRNow? Hubungi kami hari ini untuk mendiskusikan bagaimana solusi HR kami dapat membantu bisnis Anda tumbuh dan berkembang.",
+    url: `${siteConfig.url}/contact`,
+  }}
+>
+  <section class="container mx-auto pt-28 md:pt-44 px-5 md:px-0 py-16 md:py-24">
+    <div class="grid gap-10 md:grid-cols-2 items-center">
+      {/* Left copy */}
+      <div class="md:sticky md:top-24">
+        <h2 class="text-2xl md:text-4xl font-bold leading-tight">
+          {contactContent.title}
+        </h2>
+        <p class="mt-4 text-base-content/70">{contactContent.subtitle}</p>
+
+        <div class="mt-8 flex items-center gap-3">
+          <img
+            src="/logo_hrnow_black.svg"
+            alt="HRNow Logo"
+            width={60}
+            height={60}
+          />
+          <span class="text-base-content/70">|</span>
+          <a href={siteConfig.social.email} class="link link-hover text-base">
+            {contactContent.emailLabel}
+          </a>
+        </div>
+      </div>
+      <ContactProvider client:load />
+    </div>
+  </section>
+</Layout>

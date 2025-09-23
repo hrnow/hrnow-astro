@@ -1,0 +1,81 @@
+---
+import { siteConfig } from "../assets/site";
+
+interface Props {
+  title?: string;
+  onlyTitle?: boolean;
+  description?: string;
+  image?: string;
+  url?: string; // canonical
+  noIndex?: boolean;
+  keywords?: string[];
+  // optional: schema.org JSON-LD
+  jsonLd?: Record<string, any> | Record<string, any>[];
+}
+
+const {
+  title,
+  onlyTitle,
+  description,
+  image,
+  url,
+  noIndex = false,
+  keywords = ["hrnow", "recruitment", "job search"],
+  jsonLd,
+} = Astro.props;
+
+const baseUrl = siteConfig.url.replace(/\/$/, "");
+const pageUrl =
+  (url ?? baseUrl + Astro.url.pathname).replace(/\/$/, "") || baseUrl;
+
+const seoTitle = onlyTitle
+  ? (title ?? siteConfig.name)
+  : title
+    ? `${title} | ${siteConfig.name}`
+    : siteConfig.name;
+
+const seoDescription = description ?? siteConfig.description;
+const img = image ?? siteConfig.defaultImage;
+const imgAbs = img.startsWith("http") ? img : `${baseUrl}${img}`;
+const robots = noIndex ? "noindex, nofollow" : "index, follow";
+---
+
+<!-- Primary -->
+<title>{seoTitle}</title>
+<link rel="canonical" href={pageUrl} />
+<meta name="description" content={seoDescription} />
+<meta name="keywords" content={keywords.join(", ")} />
+<meta name="author" content={siteConfig.author} />
+<meta name="robots" content={robots} />
+<meta name="googlebot" content={robots} , />
+
+<!-- Open Graph -->
+<meta property="og:type" content="website" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:url" content={pageUrl} />
+<meta property="og:site_name" content={siteConfig.name} />
+<meta property="og:title" content={seoTitle} />
+<meta property="og:description" content={seoDescription} />
+<meta property="og:image" content={imgAbs} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content={seoTitle} />
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={seoTitle} />
+<meta name="twitter:description" content={seoDescription} />
+<meta name="twitter:image" content={imgAbs} />
+<meta name="twitter:creator" content={`@${siteConfig.username}`} />
+
+<!-- Optional JSON-LD -->
+{
+  jsonLd &&
+    (Array.isArray(jsonLd) ? (
+      jsonLd.map((node) => (
+        <script type="application/ld+json" set:html={JSON.stringify(node)} />
+      ))
+    ) : (
+      <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    ))
+}

@@ -1,0 +1,22 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Mission from "../components/about-us/Mission.jsx";
+import How from "../components/about-us/How.jsx";
+import History from "../components/about-us/History.astro";
+import Founders from "../components/about-us/Founders.jsx";
+import { siteConfig } from "../assets/site";
+---
+
+<Layout
+  seo={{
+    title: "Tentang Kami",
+    description:
+      "Pelajari lebih lanjut tentang HRNow, misi kami, sejarah, dan tim pendiri yang berdedikasi untuk memberikan solusi HR terbaik bagi bisnis Anda.",
+    url: `${siteConfig.url}/about-us`,
+  }}
+>
+  <Mission client:load />
+  <How client:load />
+  <History />
+  <Founders client:load />
+</Layout>

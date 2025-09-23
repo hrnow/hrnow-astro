@@ -1,0 +1,151 @@
+---
+import { siteConfig } from "../assets/site";
+import {
+  FaMapMarkerAlt,
+  FaPhone,
+  FaEnvelope,
+  FaLinkedinIn,
+  FaInstagram,
+  FaGithub,
+} from "react-icons/fa";
+
+const footerColumns = [
+  {
+    title: "Fitur",
+    as: [
+      { title: "Pencarian Kandidat", href: "#" },
+      { title: "Manajemen Pelamar", href: "#" },
+    ],
+  },
+  {
+    title: "Blog",
+    as: [
+      {
+        title: "Memperkenalkan hrnow",
+        href: "/blog/welcome",
+      },
+      {
+        title: "Tim Kecil, Proses Besar",
+        href: "/blog/small-team-big-process",
+      },
+    ],
+  },
+  {
+    title: "Informasi",
+    as: [
+      { title: "Tentang Kami", href: "/about-us" },
+      { title: "Kebijakan Privasi", href: "/privacy-policy" },
+      { title: "Syarat Layanan", href: "/terms-of-service" },
+      { title: "Mitra", href: "/partners" },
+    ],
+  },
+];
+---
+
+<footer class="border-t border-black bg-base-100 py-5 text-sm mt-12">
+  <div
+    class="mx-auto grid container px-8 md:px-0 gap-10 md:grid-cols-5 md:gap-6"
+  >
+    {/* Brand & Contact */}
+    <div class="space-y-6">
+      <img
+        src="/logo_hrnow.svg"
+        alt="HRNow Logo"
+        width={60}
+        height={26}
+        class="h-20 w-40"
+      />
+
+      <div class="space-y-3 text-base-content/70">
+        <div class="flex items-center gap-3">
+          <div class="btn btn-square rounded-xl bg-primary text-base-100">
+            <FaMapMarkerAlt />
+          </div>
+          <div>
+            <div class="font-bold">{siteConfig.location}</div>
+            <div class="text-xs text-base-content/50">Lokasi</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="btn btn-square rounded-xl bg-primary text-base-100">
+            <FaPhone />
+          </div>
+          <div>
+            <div class="font-bold">+62 21 1234 5678</div>
+            <div class="text-xs text-base-content/50">Dukungan 24/7</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="btn btn-square rounded-xl bg-primary text-base-100">
+            <FaEnvelope />
+          </div>
+          <div>
+            <div class="font-bold">{siteConfig.social.email}</div>
+            <div class="text-xs text-base-content/50">Dukungan Email</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {/* as */}
+    {
+      footerColumns.map((col) => (
+        <div>
+          <h3 class="mb-3 font-bold text-lg text-base-content tracking-tight">
+            {col.title}
+          </h3>
+          <ul class="space-y-2 text-base-content/70">
+            {col.as.map((a, index) => (
+              <li>
+                <a href={a.href} class="hover:underline">
+                  {a.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))
+    }
+
+    {/* Social */}
+    <div>
+      <h4 class="mb-3 font-semibold text-base-content">Social Media</h4>
+      <div class="flex gap-2">
+        <a
+          href={siteConfig.social.linkedin}
+          class="btn btn-square rounded-xl bg-primary text-base-100"
+        >
+          <FaLinkedinIn />
+        </a>
+        <a
+          href={siteConfig.social.instagram}
+          class="btn btn-square rounded-xl bg-primary text-base-100"
+        >
+          <FaInstagram />
+        </a>
+        <a
+          href={siteConfig.social.github}
+          class="btn btn-square rounded-xl bg-primary text-base-100"
+        >
+          <FaGithub />
+        </a>
+      </div>
+    </div>
+  </div>
+
+  {/* Bottom bar */}
+  <div class="mt-10 border-t border-black pt-6">
+    <div
+      class="flex md:flex-row flex-col justify-between container mx-auto px-8 md:px-0 md:items-center gap-2"
+    >
+      <p class="text-xs text-base-content/70">
+        © {siteConfig.year} hrnow, Ai. Semua hak dilindungi.
+      </p>
+      <div
+        class="mt-1 flex items-center md:justify-center gap-2 text-xs text-base-content/70"
+      >
+        <span>Made with ♥ in Indonesia</span>
+      </div>
+    </div>
+  </div>
+</footer>

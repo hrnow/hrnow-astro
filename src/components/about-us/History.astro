@@ -1,0 +1,50 @@
+---
+const story = {
+  title: "Kenapa Kami Membuat hrnow",
+  content: `Tahun 2025, Miracle & Peter CEO & CTO dari hrnow. merasakan sendiri betapa melelahkannya melamar kerja: CV masuk, menunggu berminggu-minggu tanpa kabar, jadwal interview yang molor, pertanyaan berulang di tiap sesi, sampai akhirnya “ghosted”. Ia sempat bergabung juga dengan jasa konsultan, dan melihat banyak HR, tapi proses tetap panjang dan tidak transparan. Dari situ Ray & Peter menyimpulkan: bukan talenta yang kurang, tapi prosesnya yang penuh friksi dan bias.`,
+  content2: `Ray lalu berdiskusi dengan Peter (CTO). Mereka merumuskan solusi sederhana: hubungkan kandidat dan perusahaan langsung, biarkan AI yang menyaring CV, mewawancarai, dan menguji teknis dengan rubrik yang konsisten, tampilkan skor & rekaman agar keputusan cepat dan bisa ditinjau, serta sediakan latihan + badge untuk kandidat agar siap sebelum melamar. Dalam beberapa iterasi, konsep itu disempurnakan menjadi HRNow—rekrut kilat, objektif, dan transparan, sehingga peluang bisa segera bertemu talenta yang tepat.
+\nsehingga sesuai misi hrnow tiap pekerjaan selalu ada dan kami mempermudah masa depan rekrutmen dan pencari kerja tanpa pengantara`,
+  image: "/peter_ray.jpg",
+  caption: "College Partner",
+} as const;
+---
+
+<section class="mx-auto container px-0 md:px-16 py-14 md:py-20">
+  <div class="rounded-2xl bg-[#ACC2FF] p-6 md:p-10">
+    <h1 class="mb-6 text-center text-2xl font-extrabold md:text-3xl">
+      {story.title}
+    </h1>
+
+    <div class="relative bg-white p-6 rounded-2xl shadow-xl">
+      <div class="text-6xl font-extrabold absolute -top-4 left-6">“</div>
+
+      <div
+        class="whitespace-pre-line text-sm leading-relaxed text-base-content/80 md:text-base"
+      >
+        <div class="mb-6">{story.content}</div>
+
+        <figure
+          class="md:float-right md:-mt-10 md:ml-4 mb-4 w-full md:w-56 mx-auto md:mx-0 -rotate-1 md:-rotate-2 h-fit overflow-hidden rounded-xl border border-base-300 bg-white p-2"
+          style={{ boxShadow: "0 4px 7px rgba(0, 0, 0, 0.4)" }}
+        >
+          <img
+            src={story.image}
+            alt="Founders"
+            width={500}
+            height={500}
+            class="rounded-lg object-[25%_25%] object-cover w-full h-40 md:h-56"
+          />
+          <figcaption
+            class="mt-2 text-center text-sm font-bold font-josefin bg-[#ECF39E] px-2 py-1 rounded"
+          >
+            {story.caption}
+          </figcaption>
+        </figure>
+
+        <div>{story.content2}</div>
+      </div>
+    </div>
+
+    <div class="clear-both"></div>
+  </div>
+</section>

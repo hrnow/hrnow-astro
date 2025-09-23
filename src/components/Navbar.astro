@@ -1,0 +1,258 @@
+---
+const appUrl = import.meta.env.PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+
+const linkItems = [
+  { label: "Tentang Kami", href: "/about-us" },
+  { label: "Blog", href: "/blog" },
+  { label: "Kontak", href: "/contact" },
+] as const;
+
+const currentPath = Astro.url.pathname;
+---
+
+<div class="drawer" id="navbar-root">
+  <input id="mobile-drawer" type="checkbox" class="drawer-toggle" />
+
+  <div class="drawer-content">
+    <nav
+      id="navbar"
+      class="navbar fixed left-1/2 -translate-x-1/2 bg-white/20 backdrop-blur-xl shadow-md border rounded-2xl w-[95%] sm:w-[90%] md:w-full md:max-w-6xl z-50 transition-all duration-300 ease-in-out top-4 md:top-10 translate-y-0"
+    >
+      <div class="navbar-start">
+        <a href="/" class="btn btn-ghost normal-case">
+          <img
+            src="/logo_hrnow.svg"
+            alt="HRNow Logo"
+            width="80"
+            height="30"
+            loading="eager"
+          />
+        </a>
+      </div>
+
+      <!-- Navbar Center - Desktop Menu -->
+      <div class="navbar-center hidden lg:flex">
+        <ul class="menu menu-horizontal px-1">
+          {
+            linkItems.map((item) => (
+              <li>
+                <a
+                  href={item.href}
+                  class={
+                    "text-sm font-medium " +
+                    (currentPath === item.href
+                      ? "text-primary"
+                      : "text-base-content")
+                  }
+                  data-active-path={item.href}
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <!-- Navbar End - CTA Buttons & Mobile Menu -->
+      <div class="navbar-end">
+        <!-- Desktop CTA Buttons -->
+        <div class="hidden lg:flex space-x-2">
+          <!-- Auth state akan ditukar via script (data-auth="in/out") -->
+          <a
+            href={appUrl}
+            class="btn btn-neutral rounded-full text-sm"
+            data-auth="in"
+            hidden
+          >
+            Kembali ke dashboard
+          </a>
+
+          <div data-auth="out" class="flex gap-2">
+            <a href={appUrl} class="btn btn-ghost text-sm font-semibold"
+              >Masuk</a
+            >
+            <a
+              href={`${appUrl}/signup`}
+              class="btn btn-neutral rounded-full text-sm">Bergabung Sekarang</a
+            >
+          </div>
+        </div>
+
+        <!-- Mobile Menu Button -->
+        <div class="lg:hidden">
+          <label
+            for="mobile-drawer"
+            class="btn btn-ghost"
+            aria-label="open menu"
+          >
+            <!-- Icon Menu (inline SVG) -->
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              ><line x1="3" y1="12" x2="21" y2="12"></line><line
+                x1="3"
+                y1="6"
+                x2="21"
+                y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg
+            >
+          </label>
+        </div>
+      </div>
+    </nav>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="drawer-side z-[60]">
+    <label for="mobile-drawer" aria-label="close sidebar" class="drawer-overlay"
+    ></label>
+
+    <div class="menu p-6 w-80 min-h-full bg-base-100 text-base-content">
+      <!-- Sidebar Header -->
+      <div class="flex items-center justify-between mb-8">
+        <img
+          src="/logo_hrnow.svg"
+          alt="HRNow Logo"
+          width="80"
+          height="30"
+          loading="lazy"
+        />
+        <label
+          for="mobile-drawer"
+          class="btn btn-ghost btn-sm"
+          aria-label="close menu"
+        >
+          <!-- Icon Close (inline SVG) -->
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            ><line x1="18" y1="6" x2="6" y2="18"></line><line
+              x1="6"
+              y1="6"
+              x2="18"
+              y2="18"></line></svg
+          >
+        </label>
+      </div>
+
+      <!-- Sidebar Menu -->
+      <ul class="space-y-4">
+        {
+          linkItems.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                class={
+                  "text-base font-medium py-3 px-4 rounded-lg hover:bg-base-200 block " +
+                  (currentPath === item.href ? "bg-base-200 text-primary" : "")
+                }
+                data-active-path={item.href}
+                data-close-drawer
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="divider my-6"></div>
+
+      <!-- Sidebar CTA -->
+      <div class="space-y-3 w-full">
+        <a
+          href={appUrl}
+          class="btn btn-neutral rounded-full text-sm w-full"
+          data-auth="in"
+          hidden
+        >
+          Kembali ke dashboard
+        </a>
+
+        <div data-auth="out" class="space-y-3 w-full">
+          <a href={appUrl} class="btn btn-ghost w-full justify-start text-base"
+            >Masuk</a
+          >
+          <a
+            href={`${appUrl}/signup`}
+            class="btn btn-neutral w-full rounded-full">Bergabung Sekarang</a
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const navbar = document.getElementById("navbar");
+  let lastScrollY = window.scrollY;
+  const onScroll = () => {
+    const y = window.scrollY;
+    const show = y < lastScrollY || y < 10;
+    if (navbar) {
+      navbar.style.top = show ? "" : "-5rem";
+    }
+    lastScrollY = y;
+  };
+  window.addEventListener("scroll", onScroll, { passive: true });
+
+  const current = location.pathname;
+  document.querySelectorAll("[data-active-path]").forEach((el) => {
+    const a = el;
+    const href = a.getAttribute("data-active-path");
+    if (href === current) {
+      a.classList.add("text-primary");
+    }
+  });
+
+  // Close drawer when clicking a link
+  const closeDrawer = () => {
+    const checkbox = document.getElementById("mobile-drawer");
+    if (checkbox) checkbox.checked = false;
+  };
+  document.querySelectorAll("[data-close-drawer]").forEach((el) => {
+    el.addEventListener("click", closeDrawer);
+  });
+
+  // Auth status fetch (client-side; respects cookies)
+  const appUrl = import.meta.env.PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+  fetch(appUrl + "/api/auth/status", { credentials: "include" })
+    .then((r) => (r.ok ? r.json() : Promise.reject()))
+    .then((data) => {
+      const isLoggedIn = !!data?.authenticated;
+      const showIn = (n) => (n = false);
+      const hide = (n) => (n = true);
+
+      document
+        .querySelectorAll('[data-auth="in"]')
+        .forEach(isLoggedIn ? showIn : hide);
+      document
+        .querySelectorAll('[data-auth="out"]')
+        .forEach(isLoggedIn ? hide : showIn);
+    })
+    .catch(() => {
+      // default: dianggap logout
+      document.querySelectorAll('[data-auth="in"]').forEach((n) => (n = true));
+      document
+        .querySelectorAll('[data-auth="out"]')
+        .forEach((n) => (n = false));
+    });
+</script>
+
+<style>
+  #navbar {
+    will-change: transform, top;
+  }
+</style>

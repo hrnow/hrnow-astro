@@ -1,0 +1,299 @@
+---
+import { getCollection } from "astro:content";
+import BlogSearch from "../components/blog/BlogSearch.jsx";
+import Layout from "../layouts/Layout.astro";
+import { siteConfig } from "../assets/site";
+
+const posts = await getCollection("blog");
+const allPosts = posts.filter((p) => p.data.published);
+const tags = {};
+allPosts.forEach((p) => {
+  (p.data.tags || []).forEach((tag) => {
+    tags[tag] = (tags[tag] || 0) + 1;
+  });
+});
+const recent = allPosts.slice(0, 5);
+---
+
+<Layout
+  seo={{
+    title: "Artikel",
+    description:
+      "Temukan berbagai artikel informatif dan terbaru seputar HR, manajemen SDM, serta tips dan trik untuk mengoptimalkan proses bisnis Anda di blog HRNow.",
+    url: `${siteConfig.url}/blog`,
+  }}
+>
+  <section
+    class="container mx-auto pt-28 md:pt-44 grid grid-cols-1 md:grid-cols-3 gap-10 px-5 md:px-0"
+  >
+    <div class="md:col-span-2 space-y-5">
+      <div>
+        <h1 class="text-2xl md:text-4xl font-bold">Informasi & Artikel</h1>
+        <p class="mt-3 text-base-content/70 text-sm">
+          Membantu kamu dan memahami lebih dalam tentang kita
+        </p>
+      </div>
+
+      <div
+        id="posts-loader"
+        class="hidden inset-0 z-10 items-center justify-center bg-base-100/70 backdrop-blur-sm"
+      >
+        <div
+          class="space-y-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
+          {
+            [...Array(3)].map((_, i) => (
+              <div class="animate-pulse">
+                <div class="bg-gray-200 h-64 rounded-lg mb-4" />
+                <div class="bg-gray-200 h-4 rounded w-3/4 mb-2" />
+                <div class="bg-gray-200 h-4 rounded w-1/2" />
+              </div>
+            ))
+          }
+        </div>
+      </div>
+      <!-- Wrapper relatif untuk overlay loading -->
+
+      <!-- Grid posts -->
+      <div
+        id="posts-grid"
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6 transition-opacity"
+      >
+        {
+          allPosts.map((post) => (
+            <article
+              class="mb-6"
+              data-blog-item
+              data-title={post.data.title || ""}
+              data-desc={post.data.description || ""}
+              data-tags={(post.data.tags || []).join(" ")}
+            >
+              <a
+                href={`/blog/${post.slug}`}
+                class="card w-full justify-end h-[350px] bg-gray-200 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow relative"
+                style={{
+                  backgroundImage: `url(${post.data.thumbnail})`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }}
+              >
+                <div class="absolute inset-0 bg-gradient-to-t from-black/100  to-transparent pointer-events-none" />
+                <div class="p-4 relative z-10 w-full">
+                  <div class="flex flex-wrap items-center gap-2 mb-2">
+                    {post.data.tags?.map((tag) => (
+                      <span class="inline-block bg-black/50 text-white text-xs px-3 py-1 rounded-full">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                  <h2 class="text-lg font-bold text-white mb-2">
+                    {(() => {
+                      const title = post.data.title ?? "";
+                      const words = title.trim().split(/\s+/);
+                      return words.length > 3
+                        ? words.slice(0, 3).join(" ") + "..."
+                        : title;
+                    })()}
+                  </h2>
+                  <p class="text-white/90 text-sm">
+                    {(() => {
+                      const desc = post.data.description ?? "";
+                      const words = desc.trim().split(/\s+/);
+                      return words.length > 10
+                        ? words.slice(0, 10).join(" ") + "..."
+                        : desc;
+                    })()}
+                  </p>
+                </div>
+              </a>
+            </article>
+          ))
+        }
+      </div>
+
+      <div id="empty-msg" class="hidden">
+        <div class="text-center py-16 mt-32">
+          <div class="max-w-md mx-auto">
+            <h2 class="text-5xl mb-4" role="img" aria-label="Crying Face">
+              😭
+            </h2>
+            <h3 class="text-2xl font-bold text-gray-900 mb-2">
+              No articles found
+            </h3>
+            <p class="text-gray-600 mb-6">
+              Kami tidak dapat menemukan artikel <br class="hidden sm:block" />
+              yang sesuai dengan pencarian atau kategori Anda.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <aside>
+      <BlogSearch client:load />
+      <div class="space-y-3 mb-10">
+        <div class="border-l-5 pl-3">
+          <h2 class="text-lg font-bold">Categories</h2>
+        </div>
+        <ul class="mt-5 text-base-content/70 flex flex-wrap gap-3">
+          {
+            Object.keys(tags)
+              .sort((a, b) => tags[b] - tags[a])
+              .map((tag) => (
+                <li>
+                  <button
+                    type="button"
+                    class="badge py-3 items-center gap-2 bg-primary  transition"
+                    data-tag-btn
+                    data-tag={tag}
+                  >
+                    <span>{tag}</span>
+                    <span class="ml-1 bg-white text-primary rounded-full px-2 text-xs">
+                      {tags[tag]}
+                    </span>
+                  </button>
+                </li>
+              ))
+          }
+        </ul>
+      </div>
+
+      <div class="space-y-3 mb-10">
+        <div class="border-l-5 pl-3">
+          <h2 class="text-lg font-bold">Recent Articles</h2>
+        </div>
+        <ul class="space-y-5">
+          {
+            recent.map((post) => (
+              <li>
+                <a
+                  href={`/blog/${post.slug}`}
+                  class="flex items-center gap-4"
+                  aria-label={post.data.title}
+                >
+                  <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-md overflow-hidden flex-shrink-0 bg-gray-200">
+                    {post.data.thumbnail ? (
+                      <img
+                        src={post.data.thumbnail}
+                        alt={post.data.title}
+                        class="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div class="w-full h-full bg-gray-300" />
+                    )}
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-start justify-between gap-4">
+                      <time class="text-sm text-black truncate">
+                        {post.data.date
+                          ? new Date(post.data.date).toLocaleDateString(
+                              undefined,
+                              {
+                                month: "long",
+                                day: "numeric",
+                                year: "numeric",
+                              }
+                            )
+                          : ""}
+                      </time>
+                    </div>
+                    <h2 class="text-sm sm:text-base font-medium truncate mt-1">
+                      {post.data.title}
+                    </h2>
+                    <p class="mt-1 text-xs opacity-75 truncate">
+                      {post.data.description}
+                    </p>
+                  </div>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </aside>
+  </section>
+</Layout>
+
+<script>
+  const items = () => Array.from(document.querySelectorAll("[data-blog-item]"));
+  const emptyMsg = () => document.getElementById("empty-msg");
+  const grid = () => document.getElementById("posts-grid");
+  const loader = () => document.getElementById("posts-loader");
+
+  let activeTag = null;
+  let lastVisible = 0;
+  let isLoading = false;
+
+  function setView(view) {
+    // view: 'loading' | 'list' | 'empty'
+    const l = loader();
+    const g = grid();
+    const e = emptyMsg();
+    if (!l || !g || !e) return;
+    l.classList.toggle("hidden", view !== "loading");
+    g.classList.toggle("hidden", view !== "list");
+    e.classList.toggle("hidden", view !== "empty");
+  }
+
+  function runFilter(rawQuery) {
+    const q = (rawQuery || "").toLowerCase().trim();
+    let visible = 0;
+    items().forEach((el: any) => {
+      const hay = (
+        el.dataset.title +
+        " " +
+        el.dataset.desc +
+        " " +
+        el.dataset.tags
+      ).toLowerCase();
+      const hasTag =
+        !activeTag || el.dataset.tags.split(" ").includes(activeTag);
+      const match = (!q || hay.includes(q)) && hasTag;
+      el.classList.toggle("hidden", !match);
+      if (match) visible++;
+    });
+    lastVisible = visible;
+    return visible;
+  }
+
+  // Initial state: show list
+  document.addEventListener("DOMContentLoaded", () => {
+    setView("list");
+  });
+
+  window.addEventListener("blog:search:start", () => {
+    isLoading = true;
+    setView("loading");
+  });
+
+  window.addEventListener("blog:search", (e: any) => {
+    // Hitung dulu (tapi jangan ubah view bila masih loading)
+    runFilter(e.detail.query);
+  });
+
+  window.addEventListener("blog:search:end", () => {
+    isLoading = false;
+    setView(lastVisible ? "list" : "empty");
+  });
+
+  document.addEventListener("click", (e: any) => {
+    const btn = e.target.closest("[data-tag-btn]");
+    if (!btn) return;
+    const tag = btn.dataset.tag;
+    activeTag = activeTag === tag ? null : tag;
+
+    document.querySelectorAll("[data-tag-btn]").forEach((b: any) => {
+      const active = b.dataset.tag === activeTag;
+      b.classList.toggle("badge-primary", active);
+      b.classList.toggle("bg-base-200", !active);
+      b.classList.toggle("text-white", active);
+    });
+
+    // Jalankan filter dengan query sekarang
+    const q =
+      (document.querySelector("[data-search-input]") as HTMLInputElement)
+        ?.value || "";
+    const count = runFilter(q);
+    if (!isLoading) setView(count ? "list" : "empty");
+  });
+</script>

@@ -1,0 +1,84 @@
+---
+const faqs = [
+  {
+    q: "Apa yang membuat Hrnow berbeda dari platform pekerjaan lain seperti LinkedIn?",
+    a: "Hrnow menggunakan otomatisasi penyaringan dan wawancara berbasis AI untuk menghemat waktu dan biaya, sementara platform seperti LinkedIn lebih fokus pada jaringan dan posting pekerjaan.",
+  },
+  {
+    q: "Apakah Hrnow akan membagikan informasi pribadi saya?",
+    a: "Tidak. Informasi pribadi Anda tetap rahasia dan hanya dibagikan dengan perusahaan yang Anda lamar, dengan izin Anda.",
+  },
+  {
+    q: "Apakah Hrnow gratis untuk digunakan?",
+    a: "Ya. Hrnow menawarkan paket gratis untuk kandidat dan fitur premium opsional untuk persiapan lanjutan.",
+  },
+  {
+    q: "Saya punya lebih banyak pertanyaan!",
+    a: "Jangan ragu untuk menghubungi tim dukungan kami melalui halaman kontak untuk bantuan lebih lanjut.",
+  },
+];
+---
+
+<section
+  class="mx-auto container px-8 md:px-16 rounded-tr-3xl rounded-b-3xl bg-base-300 py-20 mt-20"
+>
+  <h2 class="mb-8 text-2xl font-extrabold md:text-3xl">
+    Frequently
+    <br />
+    Asked Questions
+  </h2>
+  <div class="space-y-3 flex flex-col items-end">
+    {
+      faqs.map((f, i) => (
+        <div class="rounded-xl bg-base-100 p-4 shadow-sm w-full md:w-[50%]">
+          <button
+            class="flex w-full items-center justify-between text-left faq-toggle"
+            data-index={i}
+          >
+            <span class="text-sm font-medium text-base-content/90">{f.q}</span>
+            <svg
+              class="h-4 w-4 transition-transform"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-line-cap="round"
+                stroke-line-join="round"
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </button>
+          <div class="faq-answer mt-3 text-sm text-base-content/70 hidden">
+            {f.a}
+          </div>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const buttons = document.querySelectorAll(".faq-toggle");
+    buttons.forEach((btn, idx) => {
+      btn.addEventListener("click", () => {
+        const parent = btn.parentElement;
+        const answer = parent?.querySelector(".faq-answer");
+        const isOpen = !answer?.classList.contains("hidden");
+        document
+          .querySelectorAll(".faq-answer")
+          .forEach((a) => a.classList.add("hidden"));
+        document
+          .querySelectorAll(".faq-toggle svg")
+          .forEach((svg) => svg.classList.remove("rotate-180"));
+        if (!isOpen) {
+          answer?.classList.remove("hidden");
+          const svg = btn.querySelector("svg");
+          if (svg) svg.classList.add("rotate-180");
+        }
+      });
+    });
+  });
+</script>

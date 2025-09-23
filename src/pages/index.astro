@@ -1,0 +1,29 @@
+---
+import Hero from "../components/home/Hero.jsx";
+import Testimony from "../components/home/Testimony.jsx";
+import Trusted from "../components/home/Trusted.astro";
+import Layout from "../layouts/Layout.astro";
+import Faq from "../components/home/Faq.astro";
+import Sales from "../components/home/Sales.jsx";
+import CtaBanner from "../components/home/CtaBanner.astro";
+import { siteConfig } from "../assets/site";
+
+// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
+// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+---
+
+<Layout
+  seo={{
+    title: "hrnow | Aplikasi Rekrutmen dan Pencari Kerja Tanpa Perantara",
+    description: `${siteConfig.description}}`,
+    url: `${siteConfig.url}`,
+  }}
+>
+  <!-- <Welcome /> -->
+  <Hero client:load />
+  <Trusted />
+  <Testimony client:visible />
+  <Sales client:visible />
+  <Faq />
+  <CtaBanner client:visible />
+</Layout>

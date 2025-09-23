@@ -1,0 +1,106 @@
+---
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3001";
+
+const cta = {
+  title: "Masa depan rekrutmen dan pencari kerja ",
+  subtitle: "tanpa perantara",
+  buttonText: "Coba hrnow Gratis",
+  href: appUrl,
+};
+---
+
+<section class="container mx-auto mt-12">
+  <div
+    class="relative overflow-hidden rounded-2xl bg-gradient-to-b from-base-100 to-primary/70 py-12 text-center shadow-md md:py-16"
+  >
+    <img
+      src="/pattern-batik.svg"
+      height={500}
+      width={500}
+      alt="pattern-batik"
+      class="w-32 md:w-56 h-auto absolute bottom-0 right-0 opacity-50"
+    />
+
+    <img
+      src="/pattern-batik.svg"
+      height={500}
+      width={500}
+      alt="pattern-batik"
+      class="w-32 md:w-56 rotate-180 h-auto absolute bottom-0 left-0 opacity-50"
+    />
+
+    <div
+      class="mx-auto mb-5 grid h-20 w-20 place-items-center rounded-xl bg-black text-base-100 shadow"
+    >
+      <img
+        src="/logo_hrnow_white.svg"
+        alt="HRNow Logo"
+        width={60}
+        height={26}
+      />
+    </div>
+    <h2
+      class="mx-auto max-w-5xl text-xl font-bold md:text-4xl opacity-0 transition-all duration-700 ease-out observe-animate"
+    >
+      {cta.title}
+      <br />
+      <span>{cta.subtitle}</span>
+    </h2>
+    <div class="mt-5 z-10 relative observe-animate">
+      <a
+        href={cta.href}
+        class="btn btn-neutral rounded-full px-6 text-base-100"
+      >
+        {cta.buttonText}
+      </a>
+    </div>
+  </div>
+</section>
+
+<script>
+  if (typeof window !== "undefined") {
+    document.addEventListener("DOMContentLoaded", () => {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("animate-fade-in");
+              if (entry.target.classList.contains("mt-5")) {
+                entry.target.classList.add("animate-fade-in-delay");
+              }
+              observer.unobserve(entry.target); // Hentikan pengamatan setelah animasi berjalan
+            }
+          });
+        },
+        { threshold: 0.1 } // Elemen harus 10% terlihat di viewport
+      );
+
+      // Amati elemen dengan class tertentu
+      const elements = document.querySelectorAll(".observe-animate");
+      elements.forEach((el) => observer.observe(el));
+    });
+  }
+</script>
+
+<style>
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(32px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fadeInUp 0.8s forwards;
+  }
+
+  .animate-fade-in-delay {
+    animation: fadeInUp 0.8s forwards;
+    animation-delay: 0.6s;
+    opacity: 0;
+  }
+</style>
