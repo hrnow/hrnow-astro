@@ -34,6 +34,11 @@ const hasConsent = cookieHeader.includes("cookieConsent=accepted");
     <link rel="preconnect" href="https://www.google-analytics.com" />
 
     <SEO {...(seo ?? {})} />
+    <style>
+      html,body{
+        margin:0; padding:0;
+      }
+    </style>
   </head>
   <body>
     {hasConsent && (
