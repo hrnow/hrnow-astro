@@ -7,10 +7,6 @@ import Faq from "../components/home/Faq.astro";
 import Sales from "../components/home/Sales.jsx";
 import CtaBanner from "../components/home/CtaBanner.astro";
 import { siteConfig } from "../assets/site";
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
-export const prerender = false;
 ---
 
 <Layout
@@ -24,7 +20,7 @@ export const prerender = false;
   <Hero client:visible />
   <Trusted />
   <Testimony client:visible />
-  <Sales client:load/>
+  <Sales client:load />
   <Faq />
   <CtaBanner />
 </Layout>

@@ -1,4 +1,5 @@
 ---
+import { X, Menu } from "@lucide/astro";
 const appUrl = import.meta.env.PUBLIC_APP_BASE_URL ?? "http://localhost:4321";
 
 const linkItems = [
@@ -7,7 +8,15 @@ const linkItems = [
   { label: "Kontak", href: "/contact" },
 ] as const;
 
-const currentPath = Astro.url.pathname;
+const rawPath = Astro.url.pathname;
+// helper normalize
+const normalize = (p) => {
+  if (!p) return "/";
+  if (p.length > 1 && p.endsWith("/")) p = p.slice(0, -1);
+  return p;
+};
+const currentPath = normalize(rawPath);
+const normalizeHref = (href) => normalize(href);
 ---
 
 <div class="drawer" id="navbar-root">
@@ -35,15 +44,15 @@ const currentPath = Astro.url.pathname;
         <ul class="menu menu-horizontal px-1">
           {
             linkItems.map((item) => {
+              const isActive = normalizeHref(item.href) === currentPath;
               return (
                 <li>
                   <a
                     href={item.href}
+                    aria-current={isActive ? "page" : undefined}
                     class={
                       "text-sm font-medium " +
-                      (currentPath == item.href
-                        ? "text-primary"
-                        : "text-base-content")
+                      (isActive ? "text-primary" : "text-base-content")
                     }
                     data-active-path={item.href}
                   >
@@ -82,38 +91,25 @@ const currentPath = Astro.url.pathname;
         </div>
 
         <!-- Mobile Menu Button -->
-        <div class="lg:hidden">
-          <label
-            for="mobile-drawer"
-            class="btn btn-ghost"
-            aria-label="open menu"
-          >
-            <!-- Icon Menu (inline SVG) -->
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              ><line x1="3" y1="12" x2="21" y2="12"></line><line
-                x1="3"
-                y1="6"
-                x2="21"
-                y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg
-            >
+        <button class="btn btn-square btn-ghost lg:hidden">
+          <label for="mobile-drawer" aria-label="Open Menu">
+            <Menu />
+            <span class="sr-only">Buka menu</span>
           </label>
-        </div>
+        </button>
       </div>
     </nav>
   </div>
 
   <!-- Sidebar -->
-  <div class="drawer-side z-[60]">
-    <label for="mobile-drawer" aria-label="close sidebar" class="drawer-overlay"
-    ></label>
+  <div class="drawer-side z-[60] md:hidden block">
+    <label
+      for="mobile-drawer"
+      aria-label="close sidebar"
+      class="drawer-overlay hidden"
+    >
+      <span class="sr-only">Tutup sidebar</span>
+    </label>
 
     <div class="menu p-6 w-80 min-h-full bg-base-100 text-base-content">
       <!-- Sidebar Header -->
@@ -130,43 +126,32 @@ const currentPath = Astro.url.pathname;
           class="btn btn-ghost btn-sm"
           aria-label="close menu"
         >
-          <!-- Icon Close (inline SVG) -->
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            ><line x1="18" y1="6" x2="6" y2="18"></line><line
-              x1="6"
-              y1="6"
-              x2="18"
-              y2="18"></line></svg
-          >
+          <X />
+          <span class="sr-only">Tutup menu</span>
         </label>
       </div>
 
       <!-- Sidebar Menu -->
       <ul class="space-y-4">
         {
-          linkItems.map((item) => (
-            <li>
-              <a
-                href={item.href}
-                class={
-                  "text-base font-medium py-3 px-4 rounded-lg hover:bg-base-200 block " +
-                  (currentPath === item.href ? "bg-base-200 text-primary" : "")
-                }
-                data-active-path={item.href}
-                data-close-drawer
-              >
-                {item.label}
-              </a>
-            </li>
-          ))
+          linkItems.map((item) => {
+            const isActive = normalizeHref(item.href) === currentPath;
+            return (
+              <li>
+                <a
+                  href={item.href}
+                  class={
+                    "text-sm font-medium " +
+                    (isActive ? "text-primary" : "text-base-content")
+                  }
+                  data-active-path={item.href}
+                  data-close-drawer
+                >
+                  {item.label}
+                </a>
+              </li>
+            );
+          })
         }
       </ul>
 
@@ -175,7 +160,7 @@ const currentPath = Astro.url.pathname;
       <!-- Sidebar CTA -->
       <div class="space-y-3 w-full">
         <a
-          href={appUrl}
+          href={appUrl ?? "/"}
           class="btn btn-neutral rounded-full text-sm w-full"
           data-auth="in"
           hidden
@@ -184,8 +169,9 @@ const currentPath = Astro.url.pathname;
         </a>
 
         <div data-auth="out" class="space-y-3 w-full">
-          <a href={appUrl} class="btn btn-ghost w-full justify-start text-base"
-            >Masuk</a
+          <a
+            href={appUrl ?? "/"}
+            class="btn btn-ghost w-full justify-start text-base">Masuk</a
           >
           <a
             href={`${appUrl}/signup`}
@@ -195,71 +181,62 @@ const currentPath = Astro.url.pathname;
       </div>
     </div>
   </div>
-</div>
 
-<script>
-  const navbar = document.getElementById("navbar");
-  let lastScrollY = window.scrollY;
-  const onScroll = () => {
-    const y = window.scrollY;
-    const show = y < lastScrollY || y < 10;
-    if (navbar) {
-      navbar.style.top = show ? "" : "-5rem";
-    }
-    lastScrollY = y;
-  };
-  window.addEventListener("scroll", onScroll, { passive: true });
+  <script>
+    const navbar = document.getElementById("navbar");
+    let lastScrollY = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      const show = y < lastScrollY || y < 10;
+      if (navbar) {
+        navbar.style.top = show ? "" : "-5rem";
+      }
+      lastScrollY = y;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
 
-  const current = location.pathname;
-  document.querySelectorAll("[data-active-path]").forEach((el) => {
-    const a = el;
-    const href = a.getAttribute("data-active-path");
-    if (href === current) {
-      a.classList.add("text-primary");
-      a.classList.remove("text-base-content");
-    }
-  });
-
-  // Close drawer when clicking a link
-  const closeDrawer = () => {
-    const checkbox = document.getElementById(
-      "mobile-drawer"
-    ) as HTMLInputElement | null;
-    if (checkbox) checkbox.checked = false;
-  };
-  document.querySelectorAll("[data-close-drawer]").forEach((el) => {
-    el.addEventListener("click", closeDrawer);
-  });
-
-  // Auth status fetch (client-side; respects cookies)
-  const appUrl = import.meta.env.PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-  fetch(appUrl + "/api/auth/status", { credentials: "include" })
-    .then((r) => (r.ok ? r.json() : Promise.reject()))
-    .then((data) => {
-      const isLoggedIn = !!data?.authenticated;
-      const showIn = (n) => (n = false);
-      const hide = (n) => (n = true);
-
-      document
-        .querySelectorAll('[data-auth="in"]')
-        .forEach(isLoggedIn ? showIn : hide);
-      document
-        .querySelectorAll('[data-auth="out"]')
-        .forEach(isLoggedIn ? hide : showIn);
-    })
-    .catch(() => {
-      // default: dianggap logout
-      document.querySelectorAll('[data-auth="in"]').forEach((el) => {
-        (el as HTMLElement).hidden = true;
-      });
-      document.querySelectorAll('[data-auth="out"]').forEach((el) => {
-        (el as HTMLElement).hidden = false;
-      });
+    // Close drawer when clicking a link
+    const closeDrawer = () => {
+      const checkbox = document.getElementById(
+        "mobile-drawer"
+      ) as HTMLInputElement | null;
+      if (checkbox) checkbox.checked = false;
+    };
+    document.querySelectorAll("[data-close-drawer]").forEach((el) => {
+      el.addEventListener("click", closeDrawer);
     });
-</script>
 
-<style>
-  #navbar {
-    will-change: transform, top;
-  }
-</style>
+    // Auth status fetch (client-side; respects cookies)
+    const appUrl =
+      import.meta.env.PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+    fetch(appUrl + "/api/auth/status", { credentials: "include" })
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then((data) => {
+        const isLoggedIn = !!data?.authenticated;
+        const showIn = (n) => (n = false);
+        const hide = (n) => (n = true);
+
+        document
+          .querySelectorAll('[data-auth="in"]')
+          .forEach(isLoggedIn ? showIn : hide);
+        document
+          .querySelectorAll('[data-auth="out"]')
+          .forEach(isLoggedIn ? hide : showIn);
+      })
+      .catch(() => {
+        // default: dianggap logout
+        document.querySelectorAll('[data-auth="in"]').forEach((el) => {
+          (el as HTMLElement).hidden = true;
+        });
+        document.querySelectorAll('[data-auth="out"]').forEach((el) => {
+          (el as HTMLElement).hidden = false;
+        });
+      });
+  </script>
+
+  <style>
+    #navbar {
+      will-change: transform, top;
+    }
+  </style>
+</div>

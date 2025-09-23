@@ -40,7 +40,7 @@ export default function Form() {
       <Toaster richColors position="top-center" />
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="mb-1 block text-sm font-medium">
+          <label className="mb-1 block text-sm font-medium" for="name">
             <span className="text-error">*</span> Nama
           </label>
           <input
@@ -54,7 +54,7 @@ export default function Form() {
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium">
+          <label className="mb-1 block text-sm font-medium" for="email">
             <span className="text-error">*</span> Email
           </label>
           <input
@@ -68,7 +68,7 @@ export default function Form() {
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium">
+          <label className="mb-1 block text-sm font-medium" for="phone">
             <span className="text-error">*</span> Nomor Telepon
           </label>
           <input
@@ -82,7 +82,7 @@ export default function Form() {
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium">
+          <label className="mb-1 block text-sm font-medium" for="message">
             <span className="text-error">*</span> Deskripsi
           </label>
           <textarea

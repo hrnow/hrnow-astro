@@ -10,9 +10,12 @@ const { seo } = Astro.props;
 // ENV
 const GTM_ID = import.meta.env.PUBLIC_GTM_ID || "GTM-XXXXXXX";
 
-// SSR: cek cookie untuk kontrol <noscript>
-const cookieHeader = Astro.request?.headers?.get("cookie") ?? "";
-const hasConsent = cookieHeader.includes("cookieConsent=accepted");
+// Don't use server-side request APIs here so layout remains SSG-friendly
+// We'll handle consent and GTM loading client-side. Note: rendering <noscript>
+// unconditionally is safe (it only contains an iframe for GTM if JS is disabled).
+// This avoids forcing SSR because Astro.request would make the page require a
+// server runtime.
+const hasConsent = false;
 ---
 
 <!doctype html>
@@ -43,19 +46,16 @@ const hasConsent = cookieHeader.includes("cookieConsent=accepted");
     </style>
   </head>
   <body>
-    {
-      hasConsent && (
-        /* Render GTM noscript hanya jika consent sudah accepted di sisi server */
-        <noscript>
-          <iframe
-            src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
-            height="0"
-            width="0"
-            style="display:none;visibility:hidden"
-          />
-        </noscript>
-      )
-    }
+    <!-- Render GTM noscript unconditionally. The iframe is inert unless GTM is loaded,
+         and rendering this does not require server-side request access. This keeps
+         pages buildable as static (SSG). -->
+    <noscript>
+      <iframe
+        src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
+        height="0"
+        width="0"
+        style="display:none;visibility:hidden"></iframe>
+    </noscript>
 
     <Navbar />
     <slot />

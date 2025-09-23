@@ -262,6 +262,7 @@ export default function SalesFlow() {
               alt="HRNow Logo"
               width={80}
               height={46}
+              loading="lazy"
             />
           </div>
 

@@ -1,6 +1,8 @@
 import { motion } from "motion/react";
 import { TypeAnimation } from "react-type-animation";
 
+const apiUrl = import.meta.env.PUBLIC_API_URL || "http://localhost:4321";
+
 const container = {
   hidden: { opacity: 0, y: 20 },
   show: {
@@ -85,7 +87,7 @@ export default function Hero() {
               className="mt-8 flex flex-wrap items-center gap-3"
             >
               <motion.a
-                href="#"
+                href={apiUrl || "/"}
                 className="btn btn-primary rounded-full px-6"
                 whileHover={{
                   y: -2,
@@ -99,7 +101,7 @@ export default function Hero() {
               </motion.a>
 
               <motion.a
-                href="#"
+                href={`${apiUrl}/signup`}
                 className="btn btn-outline rounded-full px-6"
                 whileHover={{ y: -2 }}
                 whileTap={{ scale: 0.98 }}
@@ -273,6 +275,7 @@ export default function Hero() {
                     width={100}
                     height={100}
                     className="rounded-full bg-base-200 w-10 h-10"
+                    loading="lazy"
                   />
 
                   <div className="text-sm font-semibold">Jody Ritonga</div>

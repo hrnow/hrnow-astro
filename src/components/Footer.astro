@@ -13,8 +13,8 @@ const footerColumns = [
   {
     title: "Fitur",
     as: [
-      { title: "Pencarian Kandidat", href: "#" },
-      { title: "Manajemen Pelamar", href: "#" },
+      { title: "Pencarian Kandidat", href: "/" },
+      { title: "Manajemen Pelamar", href: "/" },
     ],
   },
   {
@@ -54,6 +54,7 @@ const footerColumns = [
         width={60}
         height={26}
         class="h-20 w-40"
+        loading="lazy"
       />
 
       <div class="space-y-3 text-base-content/70">
@@ -109,25 +110,33 @@ const footerColumns = [
 
     {/* Social */}
     <div>
-      <h4 class="mb-3 font-semibold text-base-content">Social Media</h4>
-      <div class="flex gap-2">
+      <h4
+        class="mb-3 font-semibold text-base-content"
+        id="social-media-heading"
+      >
+        Social Media
+      </h4>
+      <div class="flex gap-2" aria-labelledby="social-media-heading">
         <a
           href={siteConfig.social.linkedin}
           class="btn btn-square rounded-xl bg-primary text-base-100"
+          aria-label="LinkedIn"
         >
-          <FaLinkedinIn />
+          <FaLinkedinIn title="LinkedIn" />
         </a>
         <a
           href={siteConfig.social.instagram}
           class="btn btn-square rounded-xl bg-primary text-base-100"
+          aria-label="Instagram"
         >
-          <FaInstagram />
+          <FaInstagram title="Instagram" />
         </a>
         <a
           href={siteConfig.social.github}
           class="btn btn-square rounded-xl bg-primary text-base-100"
+          aria-label="GitHub"
         >
-          <FaGithub />
+          <FaGithub title="GitHub" />
         </a>
       </div>
     </div>
