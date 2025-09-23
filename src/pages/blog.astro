@@ -177,6 +177,7 @@ const recent = allPosts.slice(0, 5);
                         src={post.data.thumbnail}
                         alt={post.data.title}
                         class="w-full h-full object-cover"
+                        loading="lazy"
                       />
                     ) : (
                       <div class="w-full h-full bg-gray-300" />

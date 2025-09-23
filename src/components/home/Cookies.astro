@@ -1,0 +1,111 @@
+---
+import { Cookie } from "@lucide/astro";
+---
+
+<div
+  id="cookies-banner"
+  class="fixed bottom-0 left-6 z-[52] flex items-end justify-center transition-all duration-500 ease-out opacity-0 translate-y-full"
+  style="display:none"
+  aria-live="polite"
+>
+  <div class="bg-gray-200 p-2 rounded-full inline-block shadow-2xl" aria-hidden="true">
+    <div class="p-3 px-6 mx-auto flex flex-col sm:flex-row gap-6 items-center">
+      <div class="flex items-center gap-3">
+        <div class="bg-gray-300 p-2 rounded-full inline-block">
+          <Cookie />
+        </div>
+        <p class="text-sm leading-relaxed">
+          Kami menggunakan pihak ketiga{" "}
+          <span class="font-semibold underline">cookies</span> untuk meningkatkan
+          <br /> pengalaman Anda di situs web kami
+        </p>
+      </div>
+
+      <div
+        class="flex flex-wrap md:flex-nowrap gap-2 md:justify-center justify-start"
+      >
+        <button
+          id="cookie-accept"
+          class="btn btn-ghost text-xs font-medium bg-gray-300 border border-gray-400 rounded-r-xl rounded-l-4xl hover:bg-white hover:text-[#202942] transition-colors duration-200"
+        >
+          Terima
+        </button>
+        <button
+          id="cookie-reject"
+          class="btn btn-ghost text-xs font-medium border border-gray-400 rounded-l-xl rounded-r-4xl hover:bg-gray-100 transition-colors duration-200"
+        >
+          Tolak
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  // Helpers
+  function getCookie(name) {
+    if (typeof document === "undefined") return undefined;
+    return document.cookie
+      .split("; ")
+      .find((r) => r.startsWith(name + "="))
+      ?.split("=")[1];
+  }
+
+  function setCookie(name, value, days = 365) {
+    const maxAge = days * 24 * 60 * 60;
+    document.cookie = `${name}=${value}; Path=/; Max-Age=${maxAge}; SameSite=Lax; Secure`;
+  }
+
+  // Dispatch custom events untuk komunikasi dengan script tracking
+  function dispatchConsentEvent(accepted) {
+    const event = new CustomEvent(accepted ? 'cookies:accepted' : 'cookies:rejected', {
+      detail: { accepted }
+    });
+    window.dispatchEvent(event);
+  }
+
+  (function initCookieBanner() {
+    const banner = document.getElementById("cookies-banner");
+    const acceptBtn = document.getElementById("cookie-accept");
+    const rejectBtn = document.getElementById("cookie-reject");
+    if (!banner || !acceptBtn || !rejectBtn) return;
+
+    // Check existing consent
+    const existingConsent = getCookie("cookieConsent");
+    
+    if (!existingConsent) {
+      // Show banner after delay
+      setTimeout(() => {
+        banner.style.display = "flex";
+        requestAnimationFrame(() => {
+          banner.classList.remove("opacity-0", "translate-y-full");
+          banner.classList.add("opacity-100", "translate-y-0", "mb-6");
+        });
+      }, 800);
+    } else if (existingConsent === 'accepted') {
+      setTimeout(() => {
+        dispatchConsentEvent(true);
+      }, 100);
+    }
+
+    function setConsent(accepted) {
+      setCookie("cookieConsent", accepted ? "accepted" : "rejected");
+      
+      // Hide banner
+      banner.classList.remove("opacity-100", "translate-y-0", "mb-6");
+      banner.classList.add("opacity-0", "translate-y-full");
+      setTimeout(() => {
+        banner.style.display = "none";
+      }, 280);
+
+      // Dispatch event
+      dispatchConsentEvent(accepted);
+
+      // Log consent for debugging
+      console.log(`Cookie consent: ${accepted ? 'accepted' : 'rejected'}`);
+    }
+
+    acceptBtn.addEventListener("click", () => setConsent(true));
+    rejectBtn.addEventListener("click", () => setConsent(false));
+  })();
+</script>

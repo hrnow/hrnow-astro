@@ -36,10 +36,7 @@ const quotes = [
 
 export default function Testimony() {
   return (
-    <section
-      className="container mx-auto px-8 md:px-16 rounded-3xl bg-gradient-to-b from-base-100 to-primary/100 py-20 mt-20 overflow-hidden"
-      style={{ touchAction: "manipulation" }}
-    >
+    <section className="container mx-auto px-8 md:px-16 rounded-3xl bg-gradient-to-b from-base-100 to-primary/100 py-20 mt-20 overflow-hidden">
       <motion.div
         initial={{ opacity: 0, x: 50 }}
         whileInView={{ opacity: 1, x: 0 }}
@@ -51,26 +48,14 @@ export default function Testimony() {
         Tanpa mengurangi kualitas perekrutan
       </motion.div>
 
-      <motion.div
-        className="flex items-center justify-center bg-white border shadow rounded-full h-10 w-10"
-        initial={{ opacity: 0, scale: 0 }}
-        whileInView={{ opacity: 1, scale: 1 }}
-        viewport={{ once: false, amount: 0.3 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-      >
+      <div className="flex items-center justify-center bg-white border shadow rounded-full h-10 w-10">
         %
-      </motion.div>
+      </div>
 
-      <motion.p
-        className="mb-10 max-w-2xl"
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: false, amount: 0.3 }}
-        transition={{ duration: 0.6, delay: 0.4 }}
-      >
+      <p className="mb-10 max-w-2xl">
         Bagi perusahaan mencari kandidat dari para talenta terbaik, dengan tidak
         mengurangi kualitas pencarian melalui berbagai tahap screening.
-      </motion.p>
+      </p>
 
       <div className="space-y-5">
         {quotes.map((quote, i) => (
@@ -90,6 +75,7 @@ export default function Testimony() {
                 width={40}
                 height={40}
                 className="h-10 w-10 rounded-full object-cover object-top"
+                loading="lazy"
               />
               <div className="text-xs font-medium text-base-content/60">
                 {quote.author} / {quote.authorTitle}

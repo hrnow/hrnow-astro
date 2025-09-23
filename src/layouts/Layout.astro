@@ -1,9 +1,18 @@
 ---
 import Footer from "../components/Footer.astro";
+import Cookies from "../components/home/Cookies.astro";
 import Navbar from "../components/Navbar.astro";
 import SEO from "../components/SEO.astro";
 import "../styles/global.css";
+
 const { seo } = Astro.props;
+
+// ENV
+const GTM_ID = import.meta.env.PUBLIC_GTM_ID || "GTM-XXXXXXX";
+
+// SSR: cek cookie untuk kontrol <noscript>
+const cookieHeader = Astro.request?.headers?.get("cookie") ?? "";
+const hasConsent = cookieHeader.includes("cookieConsent=accepted");
 ---
 
 <!doctype html>
@@ -11,27 +20,93 @@ const { seo } = Astro.props;
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
     <meta name="generator" content={Astro.generator} />
+
+    <!-- Favicon -->
     <link rel="icon" href="/favicon.ico" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
-    <SEO {...seo ?? {}} />
+
+    <!-- Preconnect (micro-optim) -->
+    <link rel="preconnect" href="https://www.googletagmanager.com" />
+    <link rel="preconnect" href="https://www.google-analytics.com" />
+
+    <SEO {...(seo ?? {})} />
   </head>
   <body>
+    {hasConsent && (
+      /* Render GTM noscript hanya jika consent sudah accepted di sisi server */
+      <noscript>
+        <iframe
+          src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
+          height="0"
+          width="0"
+          style="display:none;visibility:hidden">
+        </iframe>
+      </noscript>
+    )}
+
     <Navbar />
     <slot />
+    <Cookies />
     <Footer />
+
+    <!-- Consent Mode v2 + GTM loader (hanya setelah accept) -->
+    <script is:inline define:vars={{ GTM_ID }}>
+      // Inisialisasi dataLayer dan consent default (DENIED) — harus sebelum GTM dimuat
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){ dataLayer.push(arguments); }
+
+      gtag('consent', 'default', {
+        ad_storage: 'denied',
+        analytics_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied',
+        wait_for_update: 500
+      });
+
+      // Hindari double-load
+      window.gtmLoaded = false;
+      function loadGTM() {
+        if (window.gtmLoaded) return;
+        var s = document.createElement('script');
+        s.async = true;
+        s.src = 'https://www.googletagmanager.com/gtm.js?id=' + GTM_ID;
+        document.head.appendChild(s);
+        window.gtmLoaded = true;
+      }
+
+      // Saat user ACCEPT dari banner cookies
+      window.addEventListener('cookies:accepted', () => {
+        gtag('consent', 'update', {
+          ad_storage: 'granted',
+          analytics_storage: 'granted',
+          ad_user_data: 'granted',
+          ad_personalization: 'granted'
+        });
+        gtag('event', 'cookie_consent', { status: 'accepted' });
+        loadGTM();
+      });
+
+      // Jika sebelumnya sudah accept (cookie sudah ada), grant + load langsung
+      (function() {
+        function getCookie(name) {
+          return document.cookie
+            .split('; ')
+            .find(r => r.startsWith(name + '='))?.split('=')[1];
+        }
+        if (getCookie('cookieConsent') === 'accepted') {
+          gtag('consent', 'update', {
+            ad_storage: 'granted',
+            analytics_storage: 'granted',
+            ad_user_data: 'granted',
+            ad_personalization: 'granted'
+          });
+          loadGTM();
+        }
+      })();
+    </script>
   </body>
 </html>
-
-<style>
-  html,
-  body {
-    margin: 0;
-    width: 100%;
-    height: 100%;
-  }
-</style>
