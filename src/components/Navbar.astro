@@ -34,22 +34,25 @@ const currentPath = Astro.url.pathname;
       <div class="navbar-center hidden lg:flex">
         <ul class="menu menu-horizontal px-1">
           {
-            linkItems.map((item) => (
-              <li>
-                <a
-                  href={item.href}
-                  class={
-                    "text-sm font-medium " +
-                    (currentPath === item.href
-                      ? "text-primary"
-                      : "text-base-content")
-                  }
-                  data-active-path={item.href}
-                >
-                  {item.label}
-                </a>
-              </li>
-            ))
+            linkItems.map((item) => {
+              console.log(currentPath, item.href);
+              return (
+                <li>
+                  <a
+                    href={item.href}
+                    class={
+                      "text-sm font-medium " +
+                      (currentPath === item.href
+                        ? "text-primary"
+                        : "text-base-content")
+                    }
+                    data-active-path={item.href}
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              );
+            })
           }
         </ul>
       </div>
@@ -214,12 +217,15 @@ const currentPath = Astro.url.pathname;
     const href = a.getAttribute("data-active-path");
     if (href === current) {
       a.classList.add("text-primary");
+      a.classList.remove("text-base-content");
     }
   });
 
   // Close drawer when clicking a link
   const closeDrawer = () => {
-    const checkbox = document.getElementById("mobile-drawer");
+    const checkbox = document.getElementById(
+      "mobile-drawer"
+    ) as HTMLInputElement | null;
     if (checkbox) checkbox.checked = false;
   };
   document.querySelectorAll("[data-close-drawer]").forEach((el) => {
@@ -244,10 +250,12 @@ const currentPath = Astro.url.pathname;
     })
     .catch(() => {
       // default: dianggap logout
-      document.querySelectorAll('[data-auth="in"]').forEach((n) => (n = true));
-      document
-        .querySelectorAll('[data-auth="out"]')
-        .forEach((n) => (n = false));
+      document.querySelectorAll('[data-auth="in"]').forEach((el) => {
+        (el as HTMLElement).hidden = true;
+      });
+      document.querySelectorAll('[data-auth="out"]').forEach((el) => {
+        (el as HTMLElement).hidden = false;
+      });
     });
 </script>
 
