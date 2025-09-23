@@ -1,6 +1,7 @@
 ---
 import { X, Menu } from "@lucide/astro";
-const appUrl = import.meta.env.PUBLIC_APP_BASE_URL ?? "http://localhost:4321";
+
+const appUrl = import.meta.env.PUBLIC_APP_URL || "https://app.hrnow.id";
 
 const linkItems = [
   { label: "Tentang Kami", href: "/about-us" },
@@ -207,31 +208,81 @@ const normalizeHref = (href) => normalize(href);
     });
 
     // Auth status fetch (client-side; respects cookies)
-    const appUrl =
-      import.meta.env.PUBLIC_API_BASE_URL ?? "http://localhost:3001";
-    fetch(appUrl + "/api/auth/status", { credentials: "include" })
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((data) => {
-        const isLoggedIn = !!data?.authenticated;
-        const showIn = (n) => (n = false);
-        const hide = (n) => (n = true);
+    (function () {
+      const API_BASE =
+        import.meta.env.PUBLIC_API_BASE_URL ?? "http://localhost:3001";
+      const KEY = "hrnow:auth";
+      const TTL = 1000 * 60 * 5; // 5 minutes
 
+      function readCache() {
+        try {
+          const raw = sessionStorage.getItem(KEY);
+          if (!raw) return null;
+          const obj = JSON.parse(raw);
+          if (obj.ts && Date.now() - obj.ts > TTL) {
+            sessionStorage.removeItem(KEY);
+            return null;
+          }
+          return obj;
+        } catch {
+          return null;
+        }
+      }
+      function writeCache(val) {
+        try {
+          sessionStorage.setItem(
+            KEY,
+            JSON.stringify({ ...val, ts: Date.now() })
+          );
+        } catch {}
+      }
+      function showLoggedIn() {
         document
           .querySelectorAll('[data-auth="in"]')
-          .forEach(isLoggedIn ? showIn : hide);
+          .forEach((el) => ((el as HTMLElement).hidden = false));
         document
           .querySelectorAll('[data-auth="out"]')
-          .forEach(isLoggedIn ? hide : showIn);
-      })
-      .catch(() => {
-        // default: dianggap logout
-        document.querySelectorAll('[data-auth="in"]').forEach((el) => {
-          (el as HTMLElement).hidden = true;
+          .forEach((el) => ((el as HTMLElement).hidden = true));
+      }
+      function showLoggedOut() {
+        document
+          .querySelectorAll('[data-auth="in"]')
+          .forEach((el) => ((el as HTMLElement).hidden = true));
+        document
+          .querySelectorAll('[data-auth="out"]')
+          .forEach((el) => ((el as HTMLElement).hidden = false));
+      }
+
+      const cached = readCache();
+      if (cached && typeof cached.authenticated !== "undefined") {
+        cached.authenticated ? showLoggedIn() : showLoggedOut();
+      } else {
+        const runWhenIdle = (fn) => {
+          if ("requestIdleCallback" in window)
+            requestIdleCallback(fn, { timeout: 500 });
+          else setTimeout(fn, 300);
+        };
+        runWhenIdle(() => {
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 3000);
+          fetch(API_BASE + "/api/auth/status", {
+            credentials: "include",
+            signal: controller.signal,
+          })
+            .then((r) => (r.ok ? r.json() : Promise.reject()))
+            .then((data) => {
+              clearTimeout(timeout);
+              const ok = !!data?.authenticated;
+              writeCache({ authenticated: ok });
+              ok ? showLoggedIn() : showLoggedOut();
+            })
+            .catch(() => {
+              writeCache({ authenticated: false });
+              showLoggedOut();
+            });
         });
-        document.querySelectorAll('[data-auth="out"]').forEach((el) => {
-          (el as HTMLElement).hidden = false;
-        });
-      });
+      }
+    })();
   </script>
 
   <style>
