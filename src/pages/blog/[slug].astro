@@ -28,6 +28,7 @@ if (!post) throw new Error("Blog not found");
 // Render isi
 const { Content, headings } = await post.render();
 const canonicalSlug = String(post.data?.slug ?? post.slug);
+export const prerender = true;
 ---
 
 <Layout
