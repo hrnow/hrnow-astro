@@ -6,7 +6,6 @@ import mdx from "@astrojs/mdx";
 import rehypeShiki from "@shikijs/rehype";
 import netlify from "@astrojs/netlify";
 import sitemap from "@astrojs/sitemap";
-// import node from "@astrojs/node";
 
 // https://astro.build/config
 export default defineConfig({
@@ -23,9 +22,5 @@ export default defineConfig({
     }),
     sitemap(),
   ],
-
   adapter: netlify(),
-  // adapter: node({
-  //   mode: "standalone",
-  // }),
 });

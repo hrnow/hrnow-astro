@@ -1,6 +1,6 @@
 FROM node:20-alpine
 
-WORKDIR /src
+WORKDIR /app
 
 # Copy package files first for better caching
 COPY package*.json ./
@@ -18,4 +18,4 @@ RUN npm run build
 EXPOSE 4321
 
 # Start the application
-CMD ["npm", "run", "start"]
+CMD ["node", "./dist/server/entry.mjs"]
