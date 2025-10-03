@@ -5,4 +5,3 @@ dist
 .netlify
 .DS_Store
 .vscode
-.env
